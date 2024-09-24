@@ -2,7 +2,7 @@ from .backpack import Backpack
 from decimal import Decimal, ROUND_HALF_UP
 
 
-class Client():
+class Client:
     def __init__(self, api_key, secret_key, proxy=""):
         self.client = Backpack(api_key, secret_key, proxy)
 
@@ -19,9 +19,13 @@ class Client():
             self.exchange_info[symbol["symbol"]] = [symbol["filters"]["quantity"]["stepSize"], symbol["filters"]["price"]["tickSize"]]
 
     def transform_value(self, val, step):
-        number = Decimal(str(val))
-        step = Decimal(str(step))
-        return (number / step).quantize(Decimal('1'), rounding=ROUND_HALF_UP) * step
+        val_dec = Decimal(str(val))
+        step_dec = Decimal(str(step))
+
+        truncated = (val_dec // step_dec) * step_dec
+        precision = abs(step_dec.as_tuple().exponent)
+
+        return "{:.{prec}f}".format(truncated, prec=precision)
 
     def transform_price(self, symbol, price):
         return float(self.transform_value(price, self.exchange_info[symbol][1]))
@@ -79,3 +83,4 @@ class Client():
         )
 
         return resp
+

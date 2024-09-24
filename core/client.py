@@ -42,7 +42,6 @@ class Client:
                 if symbol != "USDC":
                     if balance >= 2:
                         symbol_sell = symbol
-                        logger.info(f"{self.acc_name} {symbol_sell} будет продано..")
                     break
 
             if not symbol_sell:
@@ -59,9 +58,10 @@ class Client:
 
                     amount = self.client_api.transform_amount(symbol, amount_usdc / price)
 
-                    logger.info(f"{self.acc_name} {symbol_buy} будет куплено {amount}")
+                    logger.info(f"{self.acc_name} будет куплено {amount} {symbol_buy}")
                 else:
                     amount = self.client_api.transform_amount(symbol, float(balances[symbol.split("_")[0]]["available"])*0.95)
+                    logger.info(f"{self.acc_name} будет продано {amount} {symbol_sell}")
 
                 order_exc = self.client_api.long_market if side == "long" else self.client_api.short_market
                 order_exc(symbol, amount, price)
